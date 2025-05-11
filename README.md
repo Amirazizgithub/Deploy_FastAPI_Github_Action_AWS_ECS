@@ -1,5 +1,7 @@
 # FastAPI Deployment with GitHub Actions & AWS ECS
 
+**Deploy_FastAPI_Github_Action_AWS_ECS** is a GitHub repository for automating the deployment of a FastAPI application to AWS ECS using GitHub Actions. It includes CI/CD workflows for building, testing, containerizing, and deploying the application seamlessly.
+
 This repository demonstrates how to deploy a FastAPI application using GitHub Actions for CI/CD and AWS Elastic Container Service (ECS) for hosting. The project includes automated workflows for formatting, testing, building, and deploying the application.
 
 ---
