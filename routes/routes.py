@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 from model.model import Generative_AI_Model
 import warnings
 
@@ -16,11 +17,6 @@ routes = APIRouter()
 async def response_of_user_query(request: Request):
     try:
         data = await request.json()
-        # Expecting keys 'user_query' and 'model_type' from the frontend
-        if "user_query" not in data or "model_type" not in data:
-            raise HTTPException(
-                status_code=400, detail="user_query and model_type are required"
-            )
 
         user_query = data["user_query"]
         model_type = data["model_type"]
@@ -30,13 +26,8 @@ async def response_of_user_query(request: Request):
             model_type=model_type, user_query=user_query
         )
 
-    except HTTPException as e:
-        # Re-raise HTTP exceptions to ensure proper status codes
-        raise e
-
     except Exception as e:
-        # Return an error response as JSON
-        raise HTTPException(status_code=500, detail=str(e))
+        return JSONResponse(content={"message": str(e)}, status_code=500)
 
 
 # Endpoint to fetch last 10 session history
@@ -46,5 +37,16 @@ async def get_session_history():
         generative_ai_model = Generative_AI_Model()
         return generative_ai_model.get_session_history_from_MongoDB()
     except Exception as e:
+        return JSONResponse(content={"message": str(e)}, status_code=500)
+
+
+# Endpoint to check health of the service
+@routes.get("/health")
+async def get_session_history():
+    try:
+        return JSONResponse(
+            content={"message": "Service Health is Good"}, status_code=200
+        )
+    except Exception as e:
         print(f"Error in /session_history: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        return JSONResponse(content={"message": str(e)}, status_code=500)

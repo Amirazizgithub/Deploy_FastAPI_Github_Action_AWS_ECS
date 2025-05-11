@@ -8,6 +8,7 @@ from app import app
 
 # Define the path to where Generative_AI_Model is imported in routes.py
 GENERATIVE_AI_MODEL_PATH = "routes.routes.Generative_AI_Model"
+HEALTH_CHECK_PATH = "routes.routes"
 
 # # Create a TestClient instance using the FastAPI app
 client = TestClient(app)
@@ -144,6 +145,32 @@ class TestRoutes:
                 assert isinstance(response_data[0]["user_query"], str)
 
             mock_model_instance.get_session_history_from_MongoDB.assert_called_once()
+
+    # Function to test of the health check routes
+    def test_get_health_check_response(self):
+        """Test the /health endpoint success, checking response structure."""
+        # Mock health data - typically a dictionary
+        mock_health_data = {"message": "Service Health is Good"}
+        mock_health_instance = MagicMock()
+        mock_health_instance.get_health_check.return_value = mock_health_data
+
+        with patch(HEALTH_CHECK_PATH) as MockModel:
+            MockModel.return_value = mock_health_instance
+
+            response = client.get("/health")
+
+            assert response.status_code == 200
+            response_data = response.json()
+
+            # Check that the response is a list
+            assert isinstance(response_data, dict)
+            # If the list is not empty, check the structure of the first item
+            if response_data:
+                assert response_data == mock_health_data
+                assert "message" in response_data
+                assert isinstance(response_data["message"], str)
+                assert response_data["message"] == "Service Health is Good"
+            mock_health_instance.get_health_check.assert_called_once()
 
 
 # Run the tests using pytest
